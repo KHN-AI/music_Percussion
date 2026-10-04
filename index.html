@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>節奏敲擊樂園 🥁</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+--pink-light: #FFE4EC;
+--pink: #FFB8D0;
+--pink-dark: #E891A8;
+--mint: #B8E8DC;
+--mint-light: #D4F5EC;
+--mint-dark: #8ED4C4;
+--yellow: #FFE566;
+--yellow-light: #FFF4CC;
+--purple: #9B7BB8;
+--purple-light: #C4A8D8;
+--cream: #FFF8F0;
+--brown: #8B6B5B;
+--text: #6B5B6B;
+--white: #FFFFFF;
+}
+
+/* 這裡補上了遺漏的星號 * */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+-webkit-tap-highlight-color: transparent;
+user-select: none;
+}
+
+body {
+font-family: 'Noto Sans TC', sans-serif;
+background: linear-gradient(180deg, #FFD4E5 0%, #FFE4EC 50%, #FFF0F5 100%);
+min-height: 100vh;
+display: flex;
+justify-content: center;
+padding: 10px;
+overflow-x: hidden;
+}
+.dark body {
+background: linear-gradient(180deg, #3D2D35 0%, #2D2530 50%, #251D28 100%);
+}
+.bubbles {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 0;
+overflow: hidden;
+}
+.bubble {
+position: absolute;
+border-radius: 50%;
+background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+animation: floatBubble 8s infinite ease-in-out;
+}
+@keyframes floatBubble {
+0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+50% { transform: translateY(-20px) scale(1.1); opacity: 0.8; }
+}
+.app-frame {
+position: relative;
+z-index: 1;
+width: 100%;
+max-width: 420px;
+background: linear-gradient(180deg, #FFB8D0 0%, #FFC8DC 100%);
+border-radius: 30px;
+padding: 10px;
+box-shadow: 0 10px 40px rgba(200, 100, 150, 0.3);
+}
+.dark .app-frame {
+background: linear-gradient(180deg, #4A3545 0%, #3D2D38 100%);
+}
+.app-inner {
+background: linear-gradient(180deg, #C8EEE4 0%, #B8E8DC 50%, #A8E0D4 100%);
+border-radius: 25px;
+padding: 12px 10px;
+min-height: calc(100vh - 40px);
+position: relative;
+overflow: hidden;
+}
+.dark .app-inner {
+background: linear-gradient(180deg, #2D3D38 0%, #253530 50%, #1D2D28 100%);
+}
+.deco-note {
+position: absolute;
+font-size: 1.5rem;
+opacity: 0.7;
+animation: wiggle 3s infinite ease-in-out;
+}
+@keyframes wiggle {
+0%, 100% { transform: rotate(-10deg); }
+50% { transform: rotate(10deg); }
+}
+.header {
+text-align: center;
+margin-bottom: 8px;
+position: relative;
+}
+.title {
+font-size: 1.8rem;
+font-weight: 900;
+display: inline-flex;
+align-items: center;
+gap: 5px;
+}
+.title .pink { color: #E891A8; }
+.title .purple { color: #9B7BB8; }
+.title-note {
+font-size: 1.5rem;
+animation: bounce 1s infinite;
+}
+@keyframes bounce {
+0%, 100% { transform: translateY(0); }
+50% { transform: translateY(-5px); }
+}
+.deco-drum {
+position: absolute;
+right: 10px;
+top: 0;
+width: 40px;
+height: 40px;
+animation: drumBeat 1s infinite;
+}
+@keyframes drumBeat {
+0%, 100% { transform: rotate(-5deg) scale(1); }
+50% { transform: rotate(5deg) scale(1.1); }
+}
+.instruments-row {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 6px;
+margin-bottom: 8px;
+}
+.instrument-section {
+background: rgba(255, 255, 255, 0.7);
+border-radius: 15px;
+padding: 8px 6px;
+border: 2px solid var(--pink);
+}
+.dark .instrument-section {
+background: rgba(60, 50, 55, 0.7);
+border-color: #5A4555;
+}
+.section-title {
+background: var(--pink-light);
+color: var(--text);
+padding: 5px 10px;
+border-radius: 15px;
+font-size: 0.85rem;
+font-weight: 700;
+text-align: center;
+margin-bottom: 6px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 4px;
+border: 2px solid var(--pink);
+}
+.dark .section-title {
+background: #3D2D35;
+border-color: #5A4555;
+color: #E8D8E0;
+}
+.instrument-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 4px;
+}
+.instrument-grid.three-col {
+grid-template-columns: repeat(3, 1fr);
+}
+.instrument-item {
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 4px 2px;
+border-radius: 10px;
+cursor: pointer;
+transition: all 0.2s ease;
+background: rgba(255,255,255,0.5);
+}
+.dark .instrument-item {
+background: rgba(80, 70, 75, 0.5);
+}
+.instrument-item:hover {
+transform: scale(1.05);
+}
+.instrument-item.selected {
+background: linear-gradient(135deg, #FFE4EC, #FFD4E0);
+box-shadow: 0 3px 10px rgba(255, 150, 180, 0.4);
+transform: scale(1.08);
+}
+.dark .instrument-item.selected {
+background: linear-gradient(135deg, #4A3545, #3D2D38);
+}
+.instrument-icon {
+width: 48px;
+height: 48px;
+display: flex;
+align-items: center;
+justify-content: center;
+margin-bottom: 2px;
+}
+.instrument-icon svg {
+width: 100%;
+height: 100%;
+}
+.instrument-name {
+font-size: 0.75rem;
+font-weight: 700;
+color: var(--text);
+text-align: center;
+}
+.dark .instrument-name {
+color: #D8C8D0;
+}
+.rhythm-section {
+background: linear-gradient(135deg, #E8F8F4 0%, #D8F0E8 100%);
+border-radius: 15px;
+padding: 10px 8px;
+margin-bottom: 6px;
+position: relative;
+border: 2px solid var(--mint-dark);
+}
+.dark .rhythm-section {
+background: linear-gradient(135deg, #2D3D38 0%, #253530 100%);
+border-color: #3D5550;
+}
+.rhythm-label {
+position: absolute;
+top: -10px;
+left: 50%;
+transform: translateX(-50%);
+background: linear-gradient(135deg, #FFE566, #FFD84D);
+color: var(--brown);
+padding: 4px 18px;
+border-radius: 12px;
+font-size: 0.85rem;
+font-weight: 700;
+border: 2px solid #E8C844;
+}
+.dark .rhythm-label {
+background: linear-gradient(135deg, #5A5030, #4A4028);
+border-color: #6A6038;
+color: #E8D8C0;
+}
+
+.tap-section {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+margin-bottom: 6px;
+}
+.tap-area {
+width: 90px;
+height: 90px;
+border-radius: 50%;
+background: radial-gradient(circle at 40% 40%,
+rgba(255,255,255,0.9) 0%,
+rgba(200,230,255,0.6) 50%,
+rgba(180,200,230,0.4) 100%
+);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: all 0.1s ease;
+box-shadow:
+0 8px 25px rgba(100, 150, 200, 0.3),
+inset 0 -5px 15px rgba(100, 150, 200, 0.2),
+inset 0 5px 15px rgba(255, 255, 255, 0.8);
+position: relative;
+border: 4px solid rgba(255,255,255,0.6);
+}
+.dark .tap-area {
+background: radial-gradient(circle at 40% 40%,
+rgba(80,90,100,0.9) 0%,
+rgba(60,70,80,0.6) 50%,
+rgba(50,60,70,0.4) 100%
+);
+border-color: rgba(100,110,120,0.6);
+}
+.tap-area.tapping {
+transform: scale(0.95);
+box-shadow:
+0 4px 15px rgba(100, 150, 200, 0.4),
+inset 0 5px 20px rgba(100, 150, 200, 0.3);
+}
+.tap-icon {
+width: 45px;
+height: 45px;
+margin-bottom: 2px;
+}
+.tap-text {
+font-size: 0.7rem;
+font-weight: 700;
+color: var(--text);
+background: rgba(255,255,255,0.7);
+padding: 3px 8px;
+border-radius: 8px;
+}
+.dark .tap-text {
+background: rgba(60,50,55,0.7);
+color: #D8C8D0;
+}
+.tap-ripple {
+position: absolute;
+border-radius: 50%;
+background: radial-gradient(circle, rgba(255,200,220,0.6) 0%, transparent 70%);
+animation: ripple 0.5s ease-out forwards;
+pointer-events: none;
+}
+@keyframes ripple {
+from { width: 0; height: 0; opacity: 1; }
+to { width: 150px; height: 150px; opacity: 0; margin: -75px; }
+}
+.tap-label {
+background: var(--pink-light);
+color: var(--text);
+padding: 6px 12px;
+border-radius: 12px;
+font-weight: 700;
+font-size: 0.85rem;
+border: 2px solid var(--pink);
+}
+.dark .tap-label {
+background: #3D2D35;
+border-color: #5A4555;
+color: #E8D8E0;
+}
+.score-section {
+background: rgba(255, 255, 255, 0.7);
+border-radius: 15px;
+padding: 8px;
+border: 2px solid var(--pink);
+}
+.dark .score-section {
+background: rgba(60, 50, 55, 0.7);
+border-color: #5A4555;
+}
+.score-label {
+background: var(--pink-light);
+color: var(--text);
+padding: 4px 12px;
+border-radius: 12px;
+font-weight: 700;
+font-size: 0.8rem;
+display: inline-block;
+margin-bottom: 5px;
+border: 2px solid var(--pink);
+}
+.dark .score-label {
+background: #3D2D35;
+border-color: #5A4555;
+color: #E8D8E0;
+}
+.score-content {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+.stars {
+display: flex;
+gap: 2px;
+}
+.star {
+font-size: 1.4rem;
+opacity: 0.3;
+transition: all 0.3s ease;
+filter: grayscale(100%);
+}
+.star.lit {
+opacity: 1;
+filter: grayscale(0%);
+animation: starPop 0.4s ease-out;
+}
+@keyframes starPop {
+0% { transform: scale(0) rotate(-180deg); }
+100% { transform: scale(1) rotate(0); }
+}
+.score-num {
+font-size: 1.3rem;
+font-weight: 900;
+color: var(--purple);
+}
+.encourage-bubble {
+background: white;
+padding: 6px 10px;
+border-radius: 12px;
+font-size: 0.8rem;
+font-weight: 700;
+color: var(--text);
+position: relative;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.dark .encourage-bubble {
+background: #4A4045;
+color: #E8D8E0;
+}
+.encourage-bubble::before {
+content: '';
+position: absolute;
+left: -8px;
+top: 50%;
+transform: translateY(-50%);
+border: 8px solid transparent;
+border-right-color: white;
+}
+.dark .encourage-bubble::before {
+border-right-color: #4A4045;
+}
+.controls {
+display: flex;
+gap: 6px;
+margin-top: 6px;
+}
+.btn {
+flex: 1;
+padding: 10px;
+border: none;
+border-radius: 15px;
+font-family: inherit;
+font-size: 0.9rem;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.2s ease;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 4px;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-start {
+background: linear-gradient(135deg, #98E8D0, #78D8C0);
+color: #2D6D5D;
+border: 2px solid #68C8B0;
+}
+.btn-new {
+background: linear-gradient(135deg, #FFE080, #FFD060);
+color: #8D7020;
+border: 2px solid #E8C050;
+}
+.btn-demo {
+background: linear-gradient(135deg, #C8A8E8, #B898D8);
+color: white;
+border: 2px solid #A888C8;
+}
+.btn-retry {
+background: linear-gradient(135deg, #FFB8D0, #FFA8C0);
+color: white;
+border: 2px solid #E898B0;
+}
+.progress-bar {
+height: 6px;
+background: rgba(255,255,255,0.5);
+border-radius: 6px;
+overflow: hidden;
+margin: 4px 0;
+}
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(--mint), var(--mint-dark));
+border-radius: 10px;
+transition: width 0.2s ease;
+}
+.beats {
+display: flex;
+justify-content: center;
+gap: 6px;
+margin: 6px 0;
+}
+.beat-dot {
+width: 12px;
+height: 12px;
+border-radius: 50%;
+background: rgba(200, 150, 180, 0.3);
+transition: all 0.1s ease;
+}
+.beat-dot.on {
+background: var(--yellow);
+transform: scale(1.3);
+box-shadow: 0 0 10px var(--yellow);
+}
+.result-screen { display: none; }
+.result-mascot {
+text-align: center;
+font-size: 5rem;
+animation: mascotBounce 1s infinite;
+margin-bottom: 10px;
+}
+@keyframes mascotBounce {
+0%, 100% { transform: translateY(0) rotate(-3deg); }
+50% { transform: translateY(-10px) rotate(3deg); }
+}
+.result-score-big {
+text-align: center;
+font-size: 3rem;
+font-weight: 900;
+color: var(--purple);
+margin: 10px 0;
+}
+.result-msg {
+text-align: center;
+background: linear-gradient(135deg, #FFE566, #FFD84D);
+padding: 12px 20px;
+border-radius: 20px;
+font-size: 1.1rem;
+font-weight: 700;
+color: var(--brown);
+margin: 15px 0;
+border: 2px solid #E8C844;
+}
+.dark .result-msg {
+background: linear-gradient(135deg, #5A5030, #4A4028);
+border-color: #6A6038;
+color: #E8D8C0;
+}
+
+.countdown {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.7);
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 100;
+}
+.countdown-num {
+font-size: 8rem;
+font-weight: 900;
+color: white;
+text-shadow: 0 0 50px var(--pink);
+animation: countPop 1s ease-out;
+}
+@keyframes countPop {
+0% { transform: scale(3); opacity: 0; }
+50% { transform: scale(0.9); }
+100% { transform: scale(1); opacity: 1; }
+}
+.hidden { display: none !important; }
+.listen-prompt {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+padding: 10px;
+margin-top: 6px;
+background: linear-gradient(135deg, rgba(255,230,150,0.4), rgba(255,200,220,0.4));
+border-radius: 15px;
+}
+.listen-icon {
+font-size: 1.5rem;
+animation: pulse 1.5s infinite ease-in-out;
+}
+@keyframes pulse {
+0%, 100% { transform: scale(1); opacity: 1; }
+50% { transform: scale(1.1); opacity: 0.8; }
+}
+.listen-text {
+font-size: 0.9rem;
+font-weight: 700;
+color: var(--text);
+}
+.dark .listen-text { color: #E8D8E0; }
+.dark .listen-prompt {
+background: linear-gradient(135deg, rgba(90,80,48,0.4), rgba(90,60,70,0.4));
+}
+@media (max-width: 380px) {
+.title { font-size: 1.5rem; }
+.instrument-icon { width: 40px; height: 40px; }
+.instrument-name { font-size: 0.65rem; }
+.tap-area { width: 75px; height: 75px; }
+.tap-icon { width: 38px; height: 38px; }
+.section-title { font-size: 0.75rem; padding: 4px 8px; }
+.listen-text { font-size: 0.8rem; }
+.listen-icon { font-size: 1.2rem; }
+.btn { font-size: 0.8rem; padding: 8px; }
+}
+</style>
+</head>
+<body>
+<div class="bubbles" id="bubbles"></div>
+<div class="app-frame">
+<div class="app-inner">
+<span class="deco-note" style="top: 5px; left: 10px;">🎵</span>
+<span class="deco-note" style="top: 10px; right: 60px; animation-delay: 0.5s;">🎶</span>
+<!-- Decorative drum SVG -->
+<svg class="deco-drum" viewBox="0 0 50 50">
+<ellipse cx="25" cy="35" rx="18" ry="10" fill="#E8A088"/>
+<rect x="7" y="15" width="36" height="20" rx="3" fill="#F8C8B8"/>
+<ellipse cx="25" cy="15" rx="18" ry="8" fill="#FFE4D8"/>
+<line x1="12" y1="18" x2="12" y2="32" stroke="#D89878" stroke-width="2"/>
+<line x1="38" y1="18" x2="38" y2="32" stroke="#D89878" stroke-width="2"/>
+<circle cx="20" cy="22" r="2" fill="#4A3A3A"/>
+<circle cx="30" cy="22" r="2" fill="#4A3A3A"/>
+<path d="M22 27 Q25 30 28 27" stroke="#4A3A3A" stroke-width="1.5" fill="none"/>
+</svg>
+<header class="header">
+<div class="title">
+<span class="title-note">🎵</span>
+<span class="pink">節奏</span><span class="purple">敲擊樂園</span>
+<span class="title-note" style="animation-delay: 0.3s;">🎵</span>
+</div>
+</header>
+<main id="gameScreen">
+<div class="instruments-row">
+<!-- Chinese Instruments -->
+<div class="instrument-section">
+<div class="section-title">
+<span>🏮</span> 中國敲擊樂器
+</div>
+<div class="instrument-grid">
+<div class="instrument-item selected" data-id="gong" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-gong">
+<svg viewBox="0 0 60 60">
+<!-- Gong frame -->
+<rect x="10" y="5" width="4" height="35" rx="2" fill="#8B7355"/>
+<rect x="46" y="5" width="4" height="35" rx="2" fill="#8B7355"/>
+<rect x="8" y="3" width="44" height="6" rx="3" fill="#A08060"/>
+<!-- Gong -->
+<circle cx="30" cy="32" r="16" fill="#FFD700"/>
+<circle cx="30" cy="32" r="12" fill="#FFEC80"/>
+<circle cx="30" cy="32" r="5" fill="#FFD700"/>
+<!-- Face -->
+<circle cx="25" cy="30" r="2" fill="#4A3A3A"/>
+<circle cx="35" cy="30" r="2" fill="#4A3A3A"/>
+<path d="M26 36 Q30 39 34 36" stroke="#4A3A3A" stroke-width="1.5" fill="none"/>
+<!-- Hanging strings -->
+<line x1="20" y1="10" x2="20" y2="18" stroke="#C8A870" stroke-width="2"/>
+<line x1="40" y1="10" x2="40" y2="18" stroke="#C8A870" stroke-width="2"/>
+</svg>
+</div>
+<div class="instrument-name">鑼</div>
+</div>
+<div class="instrument-item" data-id="cymbal" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-cymbal">
+<svg viewBox="0 0 60 60">
+<!-- Cymbals -->
+<ellipse cx="30" cy="35" rx="22" ry="10" fill="#D4A84B"/>
+<ellipse cx="30" cy="33" rx="20" ry="8" fill="#FFD966"/>
+<ellipse cx="30" cy="25" rx="20" ry="10" fill="#D4A84B"/>
+<ellipse cx="30" cy="23" rx="18" ry="8" fill="#FFEC99"/>
+<circle cx="30" cy="23" r="4" fill="#D4A84B"/>
+<circle cx="30" cy="35" r="4" fill="#C49A3B"/>
+</svg>
+</div>
+<div class="instrument-name">鈸</div>
+</div>
+</div>
+<div class="instrument-grid three-col" style="margin-top: 4px;">
+<div class="instrument-item" data-id="woodfish" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-woodfish">
+<svg viewBox="0 0 60 60">
+<!-- Wooden fish body -->
+<ellipse cx="30" cy="35" rx="22" ry="15" fill="#8B5A2B"/>
+<ellipse cx="30" cy="32" rx="20" ry="13" fill="#A0522D"/>
+<ellipse cx="30" cy="30" rx="16" ry="10" fill="#CD853F"/>
+<!-- Opening -->
+<ellipse cx="30" cy="38" rx="8" ry="4" fill="#5D3A1A"/>
+<!-- Eye -->
+<circle cx="22" cy="28" r="3" fill="white"/>
+<circle cx="22" cy="28" r="1.5" fill="#4A3A3A"/>
+</svg>
+</div>
+<div class="instrument-name">木魚</div>
+</div>
+<div class="instrument-item" data-id="bell" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-bell">
+<svg viewBox="0 0 60 60">
+<!-- Ribbon -->
+<path d="M22 15 Q30 10 38 15" stroke="#FF8888" stroke-width="3" fill="none"/>
+<circle cx="22" cy="16" r="4" fill="#FF6B6B"/>
+<circle cx="38" cy="16" r="4" fill="#FF6B6B"/>
+<!-- Bells -->
+<circle cx="18" cy="35" r="12" fill="#FFD700"/>
+<circle cx="18" cy="33" r="10" fill="#FFEC80"/>
+<circle cx="42" cy="35" r="12" fill="#FFD700"/>
+<circle cx="42" cy="33" r="10" fill="#FFEC80"/>
+<!-- Bell bottoms -->
+<ellipse cx="18" cy="42" rx="6" ry="3" fill="#E8C020"/>
+<ellipse cx="42" cy="42" rx="6" ry="3" fill="#E8C020"/>
+<!-- Clappers -->
+<circle cx="18" cy="44" r="2" fill="#C8A010"/>
+<circle cx="42" cy="44" r="2" fill="#C8A010"/>
+</svg>
+</div>
+<div class="instrument-name">碰鈴</div>
+</div>
+<div class="instrument-item" data-id="drum" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-drum">
+<svg viewBox="0 0 60 60">
+<!-- Drum body -->
+<ellipse cx="30" cy="45" rx="20" ry="8" fill="#E8A088"/>
+<rect x="10" y="20" width="40" height="25" fill="#F8C8B8"/>
+<ellipse cx="30" cy="20" rx="20" ry="8" fill="#FFE4D8"/>
+<!-- Stripes -->
+<line x1="15" y1="22" x2="15" y2="42" stroke="#E8A088" stroke-width="2"/>
+<line x1="45" y1="22" x2="45" y2="42" stroke="#E8A088" stroke-width="2"/>
+<!-- Face -->
+<circle cx="24" cy="30" r="2.5" fill="#4A3A3A"/>
+<circle cx="36" cy="30" r="2.5" fill="#4A3A3A"/>
+<path d="M26 37 Q30 41 34 37" stroke="#4A3A3A" stroke-width="2" fill="none"/>
+<!-- Blush -->
+<ellipse cx="18" cy="34" rx="3" ry="2" fill="#FFB8B8" opacity="0.6"/>
+<ellipse cx="42" cy="34" rx="3" ry="2" fill="#FFB8B8" opacity="0.6"/>
+</svg>
+</div>
+<div class="instrument-name">大鼓</div>
+</div>
+</div>
+</div>
+<!-- Western Instruments -->
+<div class="instrument-section">
+<div class="section-title">
+<span>🎺</span> 西洋敲擊樂器
+</div>
+<div class="instrument-grid">
+<div class="instrument-item" data-id="castanet" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-castanet">
+<svg viewBox="0 0 60 60">
+<!-- Castanets -->
+<ellipse cx="22" cy="30" rx="14" ry="18" fill="#8B4513"/>
+<ellipse cx="22" cy="28" rx="12" ry="15" fill="#A0522D"/>
+<ellipse cx="38" cy="30" rx="14" ry="18" fill="#8B4513"/>
+<ellipse cx="38" cy="28" rx="12" ry="15" fill="#A0522D"/>
+<!-- Holes -->
+<circle cx="22" cy="22" r="3" fill="#5D3A1A"/>
+<circle cx="38" cy="22" r="3" fill="#5D3A1A"/>
+<!-- String -->
+<path d="M22 12 Q30 5 38 12" stroke="#CD853F" stroke-width="2" fill="none"/>
+</svg>
+</div>
+<div class="instrument-name">響板</div>
+</div>
+<div class="instrument-item" data-id="triangle" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-triangle">
+<svg viewBox="0 0 60 60">
+<!-- Triangle -->
+<path d="M30 8 L50 48 L10 48 Z" stroke="#87CEEB" stroke-width="5" fill="none" stroke-linejoin="round"/>
+<path d="M30 12 L47 45 L13 45 Z" stroke="#B0E0E6" stroke-width="3" fill="none" stroke-linejoin="round"/>
+<!-- Striker -->
+<line x1="52" y1="25" x2="40" y2="35" stroke="#C0C0C0" stroke-width="3" stroke-linecap="round"/>
+<circle cx="54" cy="23" r="3" fill="#D3D3D3"/>
+<!-- String -->
+<path d="M25 8 Q30 3 35 8" stroke="#FFB6C1" stroke-width="2" fill="none"/>
+</svg>
+</div>
+<div class="instrument-name">三角鐵</div>
+</div>
+</div>
+<div class="instrument-grid three-col" style="margin-top: 4px;">
+<div class="instrument-item" data-id="maracas" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-maracas">
+<svg viewBox="0 0 60 60">
+<!-- Left maraca -->
+<ellipse cx="18" cy="22" rx="10" ry="12" fill="#FF6B6B"/>
+<ellipse cx="18" cy="20" rx="8" ry="10" fill="#FF8E8E"/>
+<rect x="15" y="32" width="6" height="18" rx="3" fill="#8FBC8F"/>
+<!-- Face -->
+<circle cx="14" cy="18" r="1.5" fill="#4A3A3A"/>
+<circle cx="22" cy="18" r="1.5" fill="#4A3A3A"/>
+<path d="M15 24 Q18 26 21 24" stroke="#4A3A3A" stroke-width="1" fill="none"/>
+<!-- Right maraca -->
+<ellipse cx="42" cy="22" rx="10" ry="12" fill="#4ECDC4"/>
+<ellipse cx="42" cy="20" rx="8" ry="10" fill="#7EE8E0"/>
+<rect x="39" y="32" width="6" height="18" rx="3" fill="#DEB887"/>
+<!-- Face -->
+<circle cx="38" cy="18" r="1.5" fill="#4A3A3A"/>
+<circle cx="46" cy="18" r="1.5" fill="#4A3A3A"/>
+<path d="M39 24 Q42 26 45 24" stroke="#4A3A3A" stroke-width="1" fill="none"/>
+</svg>
+</div>
+<div class="instrument-name">砂槌</div>
+</div>
+<div class="instrument-item" data-id="woodblock" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-woodblock">
+<svg viewBox="0 0 60 60">
+<!-- Wood blocks -->
+<rect x="8" y="25" width="18" height="25" rx="3" fill="#DEB887"/>
+<rect x="10" y="27" width="14" height="21" rx="2" fill="#F5DEB3"/>
+<rect x="34" y="20" width="18" height="30" rx="3" fill="#D2B48C"/>
+<rect x="36" y="22" width="14" height="26" rx="2" fill="#F5DEB3"/>
+<!-- Stick -->
+<line x1="28" y1="10" x2="45" y2="18" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
+<circle cx="26" cy="9" r="4" fill="#A0522D"/>
+</svg>
+</div>
+<div class="instrument-name">響木</div>
+</div>
+<div class="instrument-item" data-id="tambourine" onclick="pickInstrument(this)">
+<div class="instrument-icon" id="icon-tambourine">
+<svg viewBox="0 0 60 60">
+<!-- Tambourine body -->
+<circle cx="30" cy="30" r="22" fill="#FFE4C4"/>
+<circle cx="30" cy="30" r="18" fill="#FFF8DC"/>
+<circle cx="30" cy="30" r="12" fill="#FFE4C4"/>
+<!-- Jingles -->
+<circle cx="12" cy="30" r="4" fill="#FFD700"/>
+<circle cx="48" cy="30" r="4" fill="#FFD700"/>
+<circle cx="30" cy="12" r="4" fill="#FFD700"/>
+<circle cx="30" cy="48" r="4" fill="#FFD700"/>
+<!-- Face -->
+<circle cx="25" cy="28" r="2" fill="#4A3A3A"/>
+<circle cx="35" cy="28" r="2" fill="#4A3A3A"/>
+<path d="M26 35 Q30 38 34 35" stroke="#4A3A3A" stroke-width="1.5" fill="none"/>
+<!-- Blush -->
+<ellipse cx="20" cy="32" rx="3" ry="2" fill="#FFB8B8" opacity="0.5"/>
+<ellipse cx="40" cy="32" rx="3" ry="2" fill="#FFB8B8" opacity="0.5"/>
+</svg>
+</div>
+<div class="instrument-name">搖鼓</div>
+</div>
+</div>
+</div>
+</div>
+<div class="rhythm-section">
+<div class="rhythm-label">聆聽節奏</div>
+<div class="listen-prompt">
+<span class="listen-icon">🎧</span>
+<span class="listen-text">專心聆聽，然後跟著敲擊！</span>
+</div>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill" style="width: 0%"></div>
+</div>
+<!-- Hidden elements for internal use -->
+<div id="rhythmDisplay" style="display: none;"></div>
+<div id="timeSig" style="display: none;"><span>4</span><span>4</span></div>
+</div>
+<div class="tap-section">
+<div class="tap-area" id="tapArea">
+<div class="tap-icon" id="tapIcon"></div>
+<div class="tap-text">點擊樂器</div>
+</div>
+<div class="tap-label">敲擊區域</div>
+</div>
+<div class="beats" id="beatsRow"></div>
+<div class="score-section">
+<div class="score-label">得分與鼓勵</div>
+<div class="score-content">
+<div class="stars" id="starsDisplay">
+<span class="star">⭐</span>
+<span class="star">⭐</span>
+<span class="star">⭐</span>
+</div>
+<div class="score-num"><span id="currentScore">0</span>/20</div>
+<div class="encourage-bubble" id="encourageText">加油！</div>
+</div>
+</div>
+<div class="controls">
+<button class="btn btn-start" id="startBtn" onclick="startGame()">▶️ 開始</button>
+<button class="btn btn-new" onclick="newRhythm()">🔄 換節奏</button>
+</div>
+</main>
+<div id="resultScreen" class="result-screen">
+<div class="result-mascot" id="resultMascot">🎉</div>
+<div class="stars" id="resultStars" style="justify-content: center; margin: 10px 0;">
+<span class="star">⭐</span>
+<span class="star">⭐</span>
+<span class="star">⭐</span>
+<span class="star">⭐</span>
+<span class="star">⭐</span>
+</div>
+<div class="result-score-big"><span id="finalScore">0</span>/20</div>
+<div class="result-msg" id="resultMsg">太棒了！繼續加油！</div>
+<div class="controls" style="margin-top: 20px;">
+<button class="btn btn-retry" onclick="retry()">🔄 再試一次</button>
+<button class="btn btn-new" onclick="newGame()">🎵 新節奏</button>
+</div>
+</div>
+</div>
+</div>
+<div id="countdown" class="countdown hidden">
+<div class="countdown-num" id="countdownNum">3</div>
+</div>
+<script>
+// Dark mode
+if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+document.documentElement.classList.add('dark');
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+document.documentElement.classList.toggle('dark', e.matches);
+});
+// Audio
+let audioCtx;
+const initAudio = () => {
+if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+if (audioCtx.state === 'suspended') audioCtx.resume();
+};
+// Instrument definitions
+const instruments = {
+gong: { play: playGong },
+cymbal: { play: playCymbal },
+woodfish: { play: playWoodfish },
+bell: { play: playBell },
+drum: { play: playDrum },
+castanet: { play: playCastanet },
+triangle: { play: playTriangle },
+maracas: { play: playMaracas },
+woodblock: { play: playWoodblock },
+tambourine: { play: playTambourine }
+};
+function playGong() {
+const now = audioCtx.currentTime;
+const osc1 = audioCtx.createOscillator();
+const osc2 = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc1.type = 'sine'; osc1.frequency.setValueAtTime(120, now);
+osc1.frequency.exponentialRampToValueAtTime(80, now + 2);
+osc2.type = 'sine'; osc2.frequency.setValueAtTime(180, now);
+osc2.frequency.exponentialRampToValueAtTime(120, now + 2);
+gain.gain.setValueAtTime(0.5, now);
+gain.gain.exponentialRampToValueAtTime(0.01, now + 2);
+osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+osc1.start(now); osc2.start(now); osc1.stop(now + 2); osc2.stop(now + 2);
+}
+function playCymbal() {
+const now = audioCtx.currentTime;
+const bufferSize = audioCtx.sampleRate * 0.6;
+const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+const data = buffer.getChannelData(0);
+for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.2));
+const source = audioCtx.createBufferSource(); source.buffer = buffer;
+const filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 3000;
+const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.4, now);
+gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+source.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); source.start(now);
+}
+function playWoodfish() {
+const now = audioCtx.currentTime;
+const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+osc.type = 'triangle'; osc.frequency.setValueAtTime(800, now);
+osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.15);
+}
+function playBell() {
+const now = audioCtx.currentTime;
+[2000, 3000, 4000].forEach((freq, i) => {
+const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+osc.type = 'sine'; osc.frequency.value = freq;
+gain.gain.setValueAtTime(0.2 / (i + 1), now);
+gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.8);
+});
+}
+function playDrum() {
+const now = audioCtx.currentTime;
+const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+osc.type = 'sine'; osc.frequency.setValueAtTime(150, now);
+osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+gain.gain.setValueAtTime(0.7, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+const noiseData = noiseBuffer.getChannelData(0);
+for (let i = 0; i < noiseData.length; i++) noiseData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.02));
+const noise = audioCtx.createBufferSource(); noise.buffer = noiseBuffer;
+const noiseGain = audioCtx.createGain(); noiseGain.gain.value = 0.3;
+noise.connect(noiseGain); noiseGain.connect(audioCtx.destination); noise.start(now);
+osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.5);
+}
+function playCastanet() {
+const now = audioCtx.currentTime;
+const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+osc.type = 'square'; osc.frequency.setValueAtTime(1500, now);
+osc.frequency.exponentialRampToValueAtTime(800, now + 0.03);
+gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.08);
+}
+function playTriangle() {
+const now = audioCtx.currentTime;
+[1760, 2637, 3520].forEach((freq, i) => {
+const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+osc.type = 'sine'; osc.frequency.value = freq;
+gain.gain.setValueAtTime(0.15 / (i + 1), now);
+gain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 1.2);
+});
+}
+function playMaracas() {
+const now = audioCtx.currentTime;
+const bufferSize = audioCtx.sampleRate * 0.15;
+const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+const data = buffer.getChannelData(0);
+for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.04));
+const source = audioCtx.createBufferSource(); source.buffer = buffer;
+const filter = audioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 5000; filter.Q.value = 1;
+const gain = audioCtx.createGain(); gain.gain.value = 0.5;
+source.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); source.start(now);
+}
+function playWoodblock() {
+const now = audioCtx.currentTime;
+const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+osc.type = 'sine'; osc.frequency.setValueAtTime(1000, now);
+osc.frequency.exponentialRampToValueAtTime(600, now + 0.02);
+gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.12);
+}
+function playTambourine() {
+const now = audioCtx.currentTime;
+const osc = audioCtx.createOscillator(); const oscGain = audioCtx.createGain();
+osc.type = 'sine'; osc.frequency.value = 200;
+oscGain.gain.setValueAtTime(0.2, now); oscGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+osc.connect(oscGain); oscGain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.1);
+const bufferSize = audioCtx.sampleRate * 0.25;
+const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+const data = buffer.getChannelData(0);
+for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.08));
+const source = audioCtx.createBufferSource(); source.buffer = buffer;
+const filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 4000;
+const gain = audioCtx.createGain(); gain.gain.value = 0.3;
+source.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); source.start(now);
+}
+// Rhythm patterns - more varied with syncopation, complex combinations
+const rhythmPatterns = [
+// 2/4 time - Basic
+{ time: 2, notes: [1, 2, 3, 4] },
+{ time: 2, notes: [1, 3] },
+{ time: 2, notes: [1, 4] },
+// 2/4 time - Syncopated
+{ time: 2, notes: [1.5, 2.5, 3.5] },
+{ time: 2, notes: [1, 1.5, 2.5, 3, 4] },
+{ time: 2, notes: [1, 2.5, 3.5, 4] },
+{ time: 2, notes: [1.5, 2, 3, 3.5, 4.5] },
+{ time: 2, notes: [1, 1.5, 2, 2.5, 3, 3.5, 4] },
+// 2/4 time - Dotted rhythms
+{ time: 2, notes: [1, 1.75, 2.5, 3, 4] },
+{ time: 2, notes: [1, 2.25, 3, 3.75] },
+// 3/4 time - Basic
+{ time: 3, notes: [1, 2, 3, 4, 5, 6] },
+{ time: 3, notes: [1, 3, 5] },
+{ time: 3, notes: [1, 4] },
+// 3/4 time - Syncopated
+{ time: 3, notes: [1.5, 2.5, 3.5, 4.5, 5.5] },
+{ time: 3, notes: [1, 2.5, 3, 4.5, 5, 6] },
+{ time: 3, notes: [1, 1.5, 3, 3.5, 5, 5.5] },
+{ time: 3, notes: [1.5, 2, 3, 4.5, 5, 6] },
+{ time: 3, notes: [1, 2, 2.5, 4, 5, 5.5] },
+// 3/4 time - Complex
+{ time: 3, notes: [1, 1.5, 2, 3.5, 4, 5, 6] },
+{ time: 3, notes: [1, 2.5, 3.5, 4, 5.5, 6] },
+// 4/4 time - Basic
+{ time: 4, notes: [1, 2, 3, 4, 5, 6, 7, 8] },
+{ time: 4, notes: [1, 3, 5, 7] },
+{ time: 4, notes: [1, 5] },
+// 4/4 time - Syncopated
+{ time: 4, notes: [1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5] },
+{ time: 4, notes: [1, 2.5, 3, 4.5, 5, 6.5, 7, 8] },
+{ time: 4, notes: [1, 1.5, 3, 3.5, 5, 5.5, 7, 7.5] },
+{ time: 4, notes: [1.5, 2, 3.5, 4, 5.5, 6, 7.5, 8] },
+{ time: 4, notes: [1, 2, 2.5, 4, 5, 5.5, 7, 8] },
+// 4/4 time - Complex combinations
+{ time: 4, notes: [1, 1.5, 2.5, 3, 4, 5.5, 6, 7, 8] },
+{ time: 4, notes: [1, 2.5, 3.5, 4.5, 5, 6, 7.5, 8] },
+{ time: 4, notes: [1, 1.5, 2, 3.5, 4.5, 5, 6.5, 7, 8] },
+{ time: 4, notes: [1.5, 2, 2.5, 3.5, 4.5, 5, 6, 6.5, 7.5] },
+// 4/4 time - Sparse with off-beats
+{ time: 4, notes: [1, 2.5, 5, 6.5] },
+{ time: 4, notes: [1.5, 3, 4.5, 7] },
+{ time: 4, notes: [1, 3.5, 5.5, 8] },
+// 4/4 time - Dense patterns
+{ time: 4, notes: [1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8] },
+{ time: 4, notes: [1, 2, 3, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8] },
+{ time: 4, notes: [1, 1.5, 2, 3, 4, 5, 5.5, 6, 7, 8] },
+// 4/4 time - Alternating patterns
+{ time: 4, notes: [1, 1.5, 3, 3.5, 5, 5.5, 7, 7.5] },
+{ time: 4, notes: [1, 2, 3.5, 4.5, 5, 6, 7.5, 8] }
+];
+// State
+let currentInstrument = 'gong';
+let currentPattern = null;
+let patternIndex = 0;
+let isPlaying = false;
+let isListening = false; // Phase 1: listening only
+let isTapping = false; // Phase 2: tapping
+let bpm = 80;
+let beatTimer = null;
+let currentBeat = 0;
+let totalBeats = 0;
+let expectedHits = [];
+let score = 0;
+let startTime = 0;
+function initBubbles() {
+const container = document.getElementById('bubbles');
+for (let i = 0; i < 15; i++) {
+const bubble = document.createElement('div');
+bubble.className = 'bubble';
+const size = 10 + Math.random() * 30;
+bubble.style.width = size + 'px';
+bubble.style.height = size + 'px';
+bubble.style.left = Math.random() * 100 + '%';
+bubble.style.top = Math.random() * 100 + '%';
+bubble.style.animationDelay = Math.random() * 8 + 's';
+bubble.style.animationDuration = (6 + Math.random() * 6) + 's';
+container.appendChild(bubble);
+}
+}
+function updateTapIcon() {
+const iconEl = document.getElementById(`icon-${currentInstrument}`);
+const tapIcon = document.getElementById('tapIcon');
+if (iconEl) {
+tapIcon.innerHTML = iconEl.innerHTML;
+}
+}
+function pickInstrument(el) {
+document.querySelectorAll('.instrument-item').forEach(i => i.classList.remove('selected'));
+el.classList.add('selected');
+currentInstrument = el.dataset.id;
+updateTapIcon();
+initAudio();
+instruments[currentInstrument].play();
+}
+function newRhythm() {
+patternIndex = Math.floor(Math.random() * rhythmPatterns.length);
+currentPattern = rhythmPatterns[patternIndex];
+renderRhythm();
+}
+function renderRhythm() {
+const beatsRow = document.getElementById('beatsRow');
+const time = currentPattern.time;
+totalBeats = time * 2;
+let dotsHtml = '';
+for (let i = 1; i <= totalBeats; i++) dotsHtml += `<div class="beat-dot" data-beat="${i}"></div>`;
+beatsRow.innerHTML = dotsHtml;
+const sorted = [...currentPattern.notes].sort((a, b) => a - b);
+expectedHits = sorted.map(beat => ({ beat, time: (beat - 1) * (60000 / bpm), hit: false }));
+}
+function startGame() {
+if (isPlaying) return;
+initAudio();
+const countdown = document.getElementById('countdown');
+const countNum = document.getElementById('countdownNum');
+countdown.classList.remove('hidden');
+let count = 3;
+countNum.textContent = count;
+const tick = () => {
+const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+osc.frequency.value = count === 0 ? 880 : 440;
+gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+};
+tick();
+const interval = setInterval(() => {
+count--;
+if (count > 0) {
+countNum.textContent = count;
+countNum.style.animation = 'none'; void countNum.offsetWidth;
+countNum.style.animation = 'countPop 1s ease-out'; tick();
+} else if (count === 0) {
+countNum.textContent = '開始!'; countNum.style.fontSize = '4rem'; tick();
+} else {
+clearInterval(interval); countdown.classList.add('hidden');
+countNum.style.fontSize = '8rem'; beginRhythm();
+}
+}, 1000);
+}
+function beginRhythm() {
+// Start Phase 1: Listening
+isPlaying = true;
+isListening = true;
+isTapping = false;
+currentBeat = 0;
+score = 0;
+expectedHits.forEach(h => h.hit = false);
+document.getElementById('startBtn').disabled = true;
+document.getElementById('currentScore').textContent = '0';
+document.getElementById('progressFill').style.width = '0%';
+document.getElementById('encourageText').textContent = '🎧 聆聽節奏...';
+document.querySelector('.listen-text').textContent = '正在播放節奏，專心聆聽！';
+document.querySelector('.listen-icon').textContent = '🔊';
+const beatMs = 60000 / bpm;
+// Play rhythm guide sound
+const playGuideSound = () => {
+const now = audioCtx.currentTime;
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.type = 'sine';
+osc.frequency.setValueAtTime(800, now);
+osc.frequency.exponentialRampToValueAtTime(500, now + 0.1);
+gain.gain.setValueAtTime(0.4, now);
+gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start(now);
+osc.stop(now + 0.2);
+};
+// Metronome tick
+const metroTick = (accent) => {
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.frequency.value = accent ? 1000 : 800;
+gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start();
+osc.stop(audioCtx.currentTime + 0.03);
+};
+// Schedule all rhythm sounds for listening phase
+const sorted = [...currentPattern.notes].sort((a, b) => a - b);
+sorted.forEach(beat => {
+const delay = (beat - 1) * beatMs;
+setTimeout(() => {
+if (isListening) playGuideSound();
+}, delay);
+});
+// Phase 1: Listening - play rhythm with metronome
+beatTimer = setInterval(() => {
+currentBeat++;
+if (currentBeat > totalBeats) {
+clearInterval(beatTimer);
+// Transition to Phase 2
+setTimeout(() => startTappingPhase(), 800);
+return;
+}
+document.getElementById('progressFill').style.width = (currentBeat / totalBeats * 100) + '%';
+document.querySelectorAll('#beatsRow .beat-dot').forEach(d => d.classList.toggle('on', parseInt(d.dataset.beat) === currentBeat));
+const accent = currentBeat === 1 || currentBeat === currentPattern.time + 1;
+metroTick(accent);
+}, beatMs);
+}
+function startTappingPhase() {
+// Prepare for tapping phase
+isListening = false;
+document.getElementById('progressFill').style.width = '0%';
+document.getElementById('encourageText').textContent = '🥁 準備敲擊！';
+document.querySelector('.listen-text').textContent = '跟著節奏敲擊！';
+document.querySelector('.listen-icon').textContent = '🥁';
+document.querySelectorAll('#beatsRow .beat-dot').forEach(d => d.classList.remove('on'));
+// Show countdown before tapping
+const countdown = document.getElementById('countdown');
+const countNum = document.getElementById('countdownNum');
+countdown.classList.remove('hidden');
+let count = 3;
+countNum.textContent = count;
+countNum.style.fontSize = '8rem';
+const tick = () => {
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.frequency.value = count === 0 ? 880 : 440;
+gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start();
+osc.stop(audioCtx.currentTime + 0.1);
+};
+tick();
+const countdownInterval = setInterval(() => {
+count--;
+if (count > 0) {
+countNum.textContent = count;
+countNum.style.animation = 'none';
+void countNum.offsetWidth;
+countNum.style.animation = 'countPop 1s ease-out';
+tick();
+} else if (count === 0) {
+countNum.textContent = '開始!';
+countNum.style.fontSize = '4rem';
+tick();
+} else {
+clearInterval(countdownInterval);
+countdown.classList.add('hidden');
+countNum.style.fontSize = '8rem';
+beginTapping();
+}
+}, 1000);
+}
+function beginTapping() {
+// Start Phase 2: Tapping
+isTapping = true;
+currentBeat = 0;
+expectedHits.forEach(h => h.hit = false);
+document.getElementById('encourageText').textContent = '👆 現在輪到你！';
+// Flash tap area to indicate start
+const tapArea = document.getElementById('tapArea');
+tapArea.style.animation = 'none';
+void tapArea.offsetWidth;
+tapArea.style.boxShadow = '0 0 30px rgba(255, 200, 100, 0.8), 0 8px 25px rgba(100, 150, 200, 0.3)';
+setTimeout(() => {
+tapArea.style.boxShadow = '';
+}, 500);
+startTime = Date.now();
+const beatMs = 60000 / bpm;
+// Metronome tick for tapping phase
+const metroTick = (accent) => {
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.frequency.value = accent ? 1000 : 800;
+gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start();
+osc.stop(audioCtx.currentTime + 0.03);
+};
+// Phase 2: Tapping - only metronome, user taps
+beatTimer = setInterval(() => {
+currentBeat++;
+if (currentBeat > totalBeats) {
+endGame();
+return;
+}
+document.getElementById('progressFill').style.width = (currentBeat / totalBeats * 100) + '%';
+document.querySelectorAll('#beatsRow .beat-dot').forEach(d => d.classList.toggle('on', parseInt(d.dataset.beat) === currentBeat));
+const accent = currentBeat === 1 || currentBeat === currentPattern.time + 1;
+metroTick(accent);
+}, beatMs);
+}
+function handleTap(e) {
+if (!isPlaying || !isTapping) return; // Only allow tapping during tapping phase
+e.preventDefault(); initAudio(); instruments[currentInstrument].play();
+const zone = document.getElementById('tapArea');
+zone.classList.add('tapping'); setTimeout(() => zone.classList.remove('tapping'), 100);
+const ripple = document.createElement('div'); ripple.className = 'tap-ripple';
+const rect = zone.getBoundingClientRect();
+const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
+zone.appendChild(ripple); setTimeout(() => ripple.remove(), 500);
+const elapsed = Date.now() - startTime;
+const beatMs = 60000 / bpm;
+const hitBeat = (elapsed / beatMs) + 1;
+const tolerance = 0.4;
+for (const exp of expectedHits) {
+if (!exp.hit && Math.abs(hitBeat - exp.beat) < tolerance) {
+exp.hit = true;
+break;
+}
+}
+}
+function endGame() {
+isPlaying = false;
+isListening = false;
+isTapping = false;
+clearInterval(beatTimer);
+const hitCount = expectedHits.filter(e => e.hit).length;
+const total = expectedHits.length;
+score = Math.round((hitCount / total) * 20);
+setTimeout(showResult, 500);
+}
+function showResult() {
+document.getElementById('gameScreen').classList.add('hidden');
+document.getElementById('resultScreen').style.display = 'block';
+document.getElementById('finalScore').textContent = score;
+const stars = Math.ceil(score / 4);
+document.querySelectorAll('#resultStars .star').forEach((s, i) => {
+setTimeout(() => s.classList.toggle('lit', i < stars), i * 200);
+});
+const mascot = document.getElementById('resultMascot');
+const msg = document.getElementById('resultMsg');
+if (score >= 18) { mascot.textContent = '🏆'; msg.textContent = '太厲害了！你是節奏小天才！🎉'; }
+else if (score >= 15) { mascot.textContent = '🌟'; msg.textContent = '太棒了！繼續加油！👏'; }
+else if (score >= 12) { mascot.textContent = '😊'; msg.textContent = '很好！繼續練習會更棒！💪'; }
+else if (score >= 8) { mascot.textContent = '🎵'; msg.textContent = '不錯喔！加油！🎶'; }
+else if (score >= 4) { mascot.textContent = '💪'; msg.textContent = '繼續努力！你做得到！✨'; }
+else { mascot.textContent = '🤗'; msg.textContent = '沒關係！多練習幾次吧！❤️'; }
+}
+function retry() {
+document.getElementById('resultScreen').style.display = 'none';
+document.getElementById('gameScreen').classList.remove('hidden');
+document.getElementById('startBtn').disabled = false;
+document.getElementById('currentScore').textContent = '0';
+document.getElementById('progressFill').style.width = '0%';
+document.getElementById('encourageText').textContent = '加油！';
+document.querySelector('.listen-text').textContent = '專心聆聽，然後跟著敲擊！';
+document.querySelector('.listen-icon').textContent = '🎧';
+document.querySelectorAll('.beat-dot').forEach(d => d.classList.remove('on'));
+document.querySelectorAll('#starsDisplay .star').forEach(s => s.classList.remove('lit'));
+isPlaying = false;
+isListening = false;
+isTapping = false;
+}
+function newGame() { newRhythm(); retry(); }
+function init() {
+initBubbles();
+newRhythm();
+updateTapIcon();
+const zone = document.getElementById('tapArea');
+zone.addEventListener('mousedown', handleTap);
+zone.addEventListener('touchstart', handleTap, { passive: false });
+zone.addEventListener('contextmenu', e => e.preventDefault());
+}
+init();
+</script>
+</body>
+</html>
